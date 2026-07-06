@@ -1,7 +1,7 @@
 -- Fichier de secours pour Ibrahima Keita
-DROP DATABASE IF EXISTS code_orion_labs;
-CREATE DATABASE code_orion_labs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE code_orion_labs;
+DROP DATABASE IF EXISTS code_asika;
+CREATE DATABASE code_asika CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE code_asika;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -20,7 +20,7 @@ CREATE TABLE users (
 
 -- Hash généré pour "Nadio24082007"
 INSERT INTO users (full_name, username, email, password, role)
-VALUES ('Ibrahima Keita', 'ibrahima', 'ibrahimakeita24@icloud.com', '$2y$10$w8k2.5G9z0X3Z9P9a9L9Oe/I1o1o1o1o1o1o1o1o1o1o1o1o1o1o1', 'admin');
+VALUES ('Ibrahima Keita', 'ibrahima', 'ibrahimakeita24@icloud.com', '$2y$10$x0LAncxVO6J9ar8PU2J6QOL4ibU9Wy097PgRJAJmxLDtEKEI8oVa2', 'admin');
 
 CREATE TABLE paths (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,3 +80,11 @@ CREATE TABLE quiz_options (
 INSERT INTO paths (title, description, icon, color_hex) VALUES
 ('Développement Web', 'HTML, CSS & JS', 'web', '#FF6B00'),
 ('Bases de données', 'SQL & Gestion des données', 'database', '#059669');
+
+-- Index de performance pour une vitesse "0 seconde"
+CREATE INDEX idx_module_path ON modules(path_id);
+CREATE INDEX idx_lesson_module ON lessons(module_id);
+CREATE INDEX idx_quiz_lesson ON quizzes(lesson_id);
+CREATE INDEX idx_option_quiz ON quiz_options(quiz_id);
+CREATE INDEX idx_user_progress_user ON user_progress(user_id);
+

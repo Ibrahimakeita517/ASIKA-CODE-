@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE ORION LABS - Apprendre à coder</title>
+    <title>CODE ASIKA - Apprendre à coder</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -12,16 +12,16 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .bg-orion-dark {
+        .bg-asika-dark {
             background-color: #0F172A;
         }
-        .text-orion-orange {
+        .text-asika-orange {
             color: #FF6B00;
         }
-        .bg-orion-orange {
+        .bg-asika-orange {
             background-color: #FF6B00;
         }
-        .border-orion-orange {
+        .border-asika-orange {
             border-color: #FF6B00;
         }
     </style>

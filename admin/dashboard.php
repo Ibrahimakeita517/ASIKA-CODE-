@@ -17,10 +17,10 @@ try {
 }
 
 $stats = [
-    ['label' => 'Total Étudiants', 'value' => number_format($total_students), 'change' => '+0', 'icon' => '👥', 'color' => 'blue'],
-    ['label' => 'Étudiants Actifs', 'value' => number_format($active_students), 'change' => '+0', 'icon' => '⚡', 'color' => 'emerald'],
-    ['label' => 'Total Parcours', 'value' => number_format($total_paths), 'change' => '+0', 'icon' => '📚', 'color' => 'orange'],
-    ['label' => 'Quiz Complétés', 'value' => number_format($quiz_completed), 'change' => '+0', 'icon' => '🎯', 'color' => 'purple'],
+    ['label' => 'Total Étudiants', 'value' => number_format($total_students), 'change' => '+0', 'icon' => 'users', 'color' => 'text-blue-600 bg-blue-50'],
+    ['label' => 'Étudiants Actifs', 'value' => number_format($active_students), 'change' => '+0', 'icon' => 'zap', 'color' => 'text-emerald-600 bg-emerald-50'],
+    ['label' => 'Total Parcours', 'value' => number_format($total_paths), 'change' => '+0', 'icon' => 'book-open', 'color' => 'text-orange-600 bg-orange-50'],
+    ['label' => 'Quiz Complétés', 'value' => number_format($quiz_completed), 'change' => '+0', 'icon' => 'target', 'color' => 'text-purple-600 bg-purple-50'],
 ];
 
 // Fetch recent students
@@ -41,8 +41,8 @@ try {
             <h3 class="text-2xl font-black text-slate-800"><?php echo $stat['value']; ?></h3>
             <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full"><?php echo $stat['change']; ?></span>
         </div>
-        <div class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl">
-            <?php echo $stat['icon']; ?>
+        <div class="w-12 h-12 <?php echo $stat['color']; ?> rounded-2xl flex items-center justify-center">
+            <i data-lucide="<?php echo $stat['icon']; ?>" class="w-6 h-6"></i>
         </div>
     </div>
     <?php endforeach; ?>
@@ -152,7 +152,12 @@ try {
                             </div>
                         </div>
                     </td>
-                    <td class="px-8 py-4 text-sm font-bold text-slate-700">⚡ <?php echo $s['xp']; ?></td>
+                    <td class="px-8 py-4 text-sm font-bold text-slate-700">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
+                            <?php echo $s['xp']; ?>
+                        </div>
+                    </td>
                     <td class="px-8 py-4">
                         <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-500">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>

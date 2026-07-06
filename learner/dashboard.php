@@ -8,15 +8,17 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Récupérer les informations réelles de l'utilisateur
-$stmt = $pdo->prepare("SELECT full_name, xp, level, streak FROM users WHERE id = ?");
+// Récupérer les infos utilisateur et stats en UNE SEULE requête (Optimisation 0 seconde)
+$stmt = $pdo->prepare("
+    SELECT u.full_name, u.xp, u.level, u.streak, COUNT(up.id) as total_completed
+    FROM users u
+    LEFT JOIN user_progress up ON u.id = up.user_id
+    WHERE u.id = ?
+    GROUP BY u.id
+");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
-
-// Statistiques de progression réelles
-$completed_lessons = $pdo->prepare("SELECT COUNT(*) FROM user_progress WHERE user_id = ?");
-$completed_lessons->execute([$user_id]);
-$total_completed = $completed_lessons->fetchColumn();
+$total_completed = $user['total_completed'];
 
 // Simulation de cours actif (pourrait être dynamisé avec une table 'current_lesson')
 $stmt = $pdo->prepare("
@@ -34,21 +36,21 @@ $current_lesson = $stmt->fetch();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - CODE ORION LABS</title>
+    <title>Tableau de bord - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .bg-orion-dark { background-color: #0B0E14; }
-        .bg-orion-card { background-color: #161B22; }
-        .text-orion-orange { color: #FF6B00; }
-        .bg-orion-orange { background-color: #FF6B00; }
+        .bg-asika-dark { background-color: #0B0E14; }
+        .bg-asika-card { background-color: #161B22; }
+        .text-asika-orange { color: #FF6B00; }
+        .bg-asika-orange { background-color: #FF6B00; }
     </style>
 </head>
 <body class="bg-white min-h-screen pb-24">
 
     <!-- Header / User Info (Dark Top) -->
-    <div class="bg-orion-dark text-white px-6 pt-10 pb-8 rounded-b-[2.5rem] shadow-xl">
+    <div class="bg-asika-dark text-white px-6 pt-10 pb-8 rounded-b-[2.5rem] shadow-xl">
         <div class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-gray-400 text-sm font-medium">Bonjour 👋</p>
@@ -93,7 +95,7 @@ $current_lesson = $stmt->fetch();
                 ?>
                 <div class="flex-1 flex flex-col items-center gap-2">
                     <div class="w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold transition-all
-                        <?php echo $active ? 'bg-orion-orange text-white' : ($is_today ? 'border-2 border-orion-orange text-orion-orange' : 'bg-gray-800 text-gray-600'); ?>">
+                        <?php echo $active ? 'bg-asika-orange text-white' : ($is_today ? 'border-2 border-asika-orange text-asika-orange' : 'bg-gray-800 text-gray-600'); ?>">
                         <?php echo $active ? '✓' : $day; ?>
                     </div>
                 </div>
@@ -159,7 +161,7 @@ $current_lesson = $stmt->fetch();
         <!-- Badges Section Mature -->
         <div class="mb-8">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="font-bold text-slate-900 tracking-tight">Récompenses Orion</h3>
+                <h3 class="font-bold text-slate-900 tracking-tight">Récompenses Asika</h3>
                 <div class="flex items-center gap-1 text-slate-400">
                     <i data-lucide="lock" class="w-3 h-3"></i>
                     <span class="text-[10px] font-bold uppercase tracking-tighter">Bientôt</span>
@@ -181,10 +183,6 @@ $current_lesson = $stmt->fetch();
             </div>
         </div>
     </div>
-
-    <!-- Script Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>lucide.createIcons();</script>
 
     <!-- Bottom Navigation -->
     <?php include '../includes/bottom_nav.php'; ?>

@@ -16,45 +16,45 @@ if (!$course) {
     redirect('paths.php');
 }
 
-// Récupération des modules et leçons
-$stmt = $pdo->prepare("SELECT * FROM modules WHERE path_id = ? ORDER BY order_index ASC");
-$stmt->execute([$path_id]);
-$db_modules = $stmt->fetchAll();
+// Récupération des modules et leçons en UNE SEULE requête (Optimisation 0 seconde)
+$stmt = $pdo->prepare("
+    SELECT m.id as module_id, m.title as module_title, m.order_index as module_order,
+           l.id as lesson_id, l.title as lesson_title, l.duration_min, l.order_index as lesson_order,
+           (SELECT COUNT(*) FROM user_progress WHERE user_id = ? AND lesson_id = l.id) as is_completed
+    FROM modules m
+    LEFT JOIN lessons l ON l.module_id = m.id
+    WHERE m.path_id = ?
+    ORDER BY m.order_index ASC, l.order_index ASC
+");
+$stmt->execute([$user_id, $path_id]);
+$all_data = $stmt->fetchAll();
 
 $modules = [];
 $total_lessons = 0;
 $completed_lessons = 0;
 
-foreach ($db_modules as $m) {
-    $stmt = $pdo->prepare("
-        SELECT l.*,
-        (SELECT COUNT(*) FROM user_progress WHERE user_id = ? AND lesson_id = l.id) as is_completed
-        FROM lessons l
-        WHERE l.module_id = ?
-        ORDER BY l.order_index ASC
-    ");
-    $stmt->execute([$user_id, $m['id']]);
-    $lessons = $stmt->fetchAll();
-
-    $module_lessons = [];
-    foreach ($lessons as $l) {
-        $total_lessons++;
-        if ($l['is_completed']) $completed_lessons++;
-
-        $module_lessons[] = [
-            'id' => $l['id'],
-            'title' => $l['title'],
-            'duration' => $l['duration_min'] . ' min',
-            'status' => $l['is_completed'] ? 'completed' : 'current'
+foreach ($all_data as $row) {
+    $m_id = $row['module_id'];
+    if (!isset($modules[$m_id])) {
+        $modules[$m_id] = [
+            'id' => $m_id,
+            'number' => $row['module_order'],
+            'title' => $row['module_title'],
+            'lessons' => []
         ];
     }
 
-    $modules[] = [
-        'id' => $m['id'],
-        'number' => $m['order_index'],
-        'title' => $m['title'],
-        'lessons' => $module_lessons
-    ];
+    if ($row['lesson_id']) {
+        $total_lessons++;
+        if ($row['is_completed']) $completed_lessons++;
+
+        $modules[$m_id]['lessons'][] = [
+            'id' => $row['lesson_id'],
+            'title' => $row['lesson_title'],
+            'duration' => $row['duration_min'] . ' min',
+            'status' => $row['is_completed'] ? 'completed' : 'current'
+        ];
+    }
 }
 
 $progress_pct = $total_lessons > 0 ? round(($completed_lessons / $total_lessons) * 100) : 0;
@@ -64,7 +64,7 @@ $progress_pct = $total_lessons > 0 ? round(($completed_lessons / $total_lessons)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($course['title']); ?> - CODE ORION LABS</title>
+    <title><?php echo htmlspecialchars($course['title']); ?> - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>

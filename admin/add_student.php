@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="max-w-2xl mx-auto">
     <div class="flex items-center gap-4 mb-8">
         <a href="students.php" class="text-gray-400 hover:text-slate-800 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <i data-lucide="arrow-left" class="w-6 h-6"></i>
         </a>
         <h2 class="text-2xl font-black text-slate-800">Ajouter un nouvel élève</h2>
     </div>

@@ -50,7 +50,7 @@ $current_pos = $stmt->fetchColumn();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($lesson['title']); ?> - CODE ORION LABS</title>
+    <title><?php echo htmlspecialchars($lesson['title']); ?> - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -142,7 +142,7 @@ $current_pos = $stmt->fetchColumn();
 
                 <div class="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
                     <i data-lucide="award" class="w-5 h-5 text-orange-400"></i>
-                    <p class="text-[11px] text-slate-300 font-medium">Récompense : <b class="text-white"><?php echo $lesson['xp_reward']; ?> XP</b> Orion Labs</p>
+                    <p class="text-[11px] text-slate-300 font-medium">Récompense : <b class="text-white"><?php echo $lesson['xp_reward']; ?> XP</b> Asika Labs</p>
                 </div>
             </div>
         </div>

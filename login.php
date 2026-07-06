@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - CODE ORION LABS</title>
+    <title>Connexion - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .orion-shadow { shadow-offset: 0px 4px; shadow-color: rgba(0,0,0,0.05); }
+        .asika-shadow { shadow-offset: 0px 4px; shadow-color: rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
         </div>
-        <h1 class="text-xl font-bold text-slate-900">CODE <span class="text-orange-600">ORION</span> LABS</h1>
+        <h1 class="text-xl font-bold text-slate-900">CODE <span class="text-orange-600">ASIKA</span></h1>
         <p class="text-xs text-gray-500 font-medium">La plateforme d'apprentissage du code</p>
     </div>
 
@@ -99,21 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Se connecter
             </button>
         </form>
-
-        <div class="relative my-8">
-            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100"></div></div>
-            <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-4 text-gray-400 font-medium">ou</span></div>
-        </div>
-
-        <button class="w-full flex items-center justify-center gap-3 px-5 py-4 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-all font-medium text-slate-700">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5" alt="Google">
-            Continuer avec Google
-        </button>
     </div>
-
-    <p class="mt-8 text-sm text-slate-600">
-        Pas encore de compte ? <a href="#" class="text-orange-600 font-bold hover:underline">S'inscrire gratuitement</a>
-    </p>
 
 </body>
 </html>

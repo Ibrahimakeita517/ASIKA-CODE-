@@ -15,7 +15,7 @@ $students = $stmt->fetchAll();
     </div>
     <div class="flex gap-3">
         <a href="add_student.php" class="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold px-6 py-3 rounded-2xl shadow-lg shadow-orange-600/20 transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
             Inscrire un élève
         </a>
     </div>
@@ -37,7 +37,9 @@ $students = $stmt->fetchAll();
             <tr>
                 <td colspan="5" class="px-8 py-20 text-center">
                     <div class="flex flex-col items-center">
-                        <span class="text-4xl mb-4">👥</span>
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <i data-lucide="users" class="w-8 h-8 text-gray-300"></i>
+                        </div>
                         <p class="text-gray-400 font-medium">Aucun étudiant n'est encore inscrit.</p>
                         <a href="add_student.php" class="text-orange-600 font-bold text-sm mt-2 underline">Ajouter le premier élève</a>
                     </div>
@@ -60,7 +62,12 @@ $students = $stmt->fetchAll();
                         </div>
                     </div>
                 </td>
-                <td class="px-8 py-5 text-center text-sm font-bold text-slate-700">⚡ <?php echo $s['xp']; ?></td>
+                <td class="px-8 py-5 text-center text-sm font-bold text-slate-700">
+                    <div class="flex items-center justify-center gap-1">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <?php echo $s['xp']; ?>
+                    </div>
+                </td>
                 <td class="px-8 py-5 text-center">
                     <span class="text-xs font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-full">Lvl <?php echo $s['level']; ?></span>
                 </td>
@@ -69,9 +76,14 @@ $students = $stmt->fetchAll();
                 </td>
                 <td class="px-8 py-5">
                     <div class="flex justify-end gap-2">
-                        <button class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-orange-50 hover:text-orange-600 transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </button>
+                        <a href="edit_student.php?id=<?php echo $s['id']; ?>" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-orange-50 hover:text-orange-600 transition-all" title="Modifier">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </a>
+                        <a href="delete_student.php?id=<?php echo $s['id']; ?>"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?')"
+                           class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-all" title="Supprimer">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </a>
                     </div>
                 </td>
             </tr>

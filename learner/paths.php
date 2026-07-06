@@ -6,31 +6,25 @@ if (!isset($_SESSION['user_id'])) { redirect('../login.php'); }
 
 $user_id = $_SESSION['user_id'];
 
-// Récupération des parcours réels depuis la base de données
-$stmt = $pdo->query("
+// Récupération des parcours et progression en UNE SEULE requête (Optimisation 0 seconde)
+$stmt = $pdo->prepare("
     SELECT p.*,
-    (SELECT COUNT(*) FROM modules m JOIN lessons l ON l.module_id = m.id WHERE m.path_id = p.id) as total_lessons,
-    (SELECT COUNT(*) FROM modules m WHERE m.path_id = p.id) as total_modules
+           COUNT(DISTINCT m.id) as total_modules,
+           COUNT(DISTINCT l.id) as total_lessons,
+           COUNT(DISTINCT up.lesson_id) as completed_lessons
     FROM paths p
+    LEFT JOIN modules m ON m.path_id = p.id
+    LEFT JOIN lessons l ON l.module_id = m.id
+    LEFT JOIN user_progress up ON up.lesson_id = l.id AND up.user_id = ?
     WHERE p.is_active = 1
+    GROUP BY p.id
 ");
+$stmt->execute([$user_id]);
 $paths_db = $stmt->fetchAll();
 
-// Calcul de la progression pour chaque parcours
 $paths = [];
 foreach ($paths_db as $p) {
-    // Nombre de leçons complétées par l'utilisateur dans ce parcours
-    $stmt_prog = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM user_progress up
-        JOIN lessons l ON up.lesson_id = l.id
-        JOIN modules m ON l.module_id = m.id
-        WHERE up.user_id = ? AND m.path_id = ?
-    ");
-    $stmt_prog->execute([$user_id, $p['id']]);
-    $completed = $stmt_prog->fetchColumn();
-
-    $progress = ($p['total_lessons'] > 0) ? round(($completed / $p['total_lessons']) * 100) : 0;
+    $progress = ($p['total_lessons'] > 0) ? round(($p['completed_lessons'] / $p['total_lessons']) * 100) : 0;
 
     $paths[] = [
         'id' => $p['id'],
@@ -38,7 +32,7 @@ foreach ($paths_db as $p) {
         'subtitle' => $p['description'],
         'modules' => $p['total_modules'],
         'lessons' => $p['total_lessons'],
-        'duration' => ($p['total_lessons'] * 15) . ' min', // Estimation simple
+        'duration' => ($p['total_lessons'] * 15) . ' min',
         'progress' => $progress,
         'color' => ($p['id'] % 2 == 0) ? 'from-emerald-900 via-emerald-800 to-teal-900' : 'from-blue-600 to-indigo-900',
         'status' => $progress > 0 ? 'En cours' : 'Nouveau',
@@ -51,7 +45,7 @@ foreach ($paths_db as $p) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcours - CODE ORION LABS</title>
+    <title>Parcours - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>

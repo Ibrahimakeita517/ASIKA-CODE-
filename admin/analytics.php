@@ -65,7 +65,10 @@ $path_stats = $stmt->fetchAll();
                         <?php echo $i + 1; ?>
                     </div>
                     <span class="flex-1 font-bold text-slate-700"><?php echo htmlspecialchars($t['full_name']); ?></span>
-                    <span class="font-black text-orange-600">⚡ <?php echo number_format($t['xp']); ?> XP</span>
+                    <span class="font-black text-orange-600 flex items-center gap-1">
+                        <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                        <?php echo number_format($t['xp']); ?> XP
+                    </span>
                 </div>
                 <?php endforeach; ?>
             <?php endif; ?>

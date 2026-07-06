@@ -6,8 +6,14 @@ if (!isset($_SESSION['user_id'])) { redirect('../login.php'); }
 
 $user_id = $_SESSION['user_id'];
 
-// Récupérer les informations réelles de l'utilisateur
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+// Récupérer les informations et stats en UNE SEULE requête (Optimisation 0 seconde)
+$stmt = $pdo->prepare("
+    SELECT u.*, COUNT(up.id) as total_completed
+    FROM users u
+    LEFT JOIN user_progress up ON u.id = up.user_id
+    WHERE u.id = ?
+    GROUP BY u.id
+");
 $stmt->execute([$user_id]);
 $user_db = $stmt->fetch();
 
@@ -15,11 +21,7 @@ if (!$user_db) {
     redirect('../logout.php');
 }
 
-// Statistiques réelles
-// 1. Nombre de leçons terminées
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM user_progress WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$total_lessons = $stmt->fetchColumn();
+$total_lessons = $user_db['total_completed'];
 
 // 2. Calcul du rang
 $rank = 'Novice';
@@ -43,20 +45,20 @@ $stats = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - CODE ORION LABS</title>
+    <title>Mon Profil - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Script Lucide pour des icônes professionnelles -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
-        .bg-orion-dark { background-color: #0F172A; }
+        .bg-asika-dark { background-color: #0F172A; }
     </style>
 </head>
 <body class="pb-32">
 
     <!-- Header / Profile Top (Design Mature) -->
-    <div class="bg-orion-dark text-white px-6 pt-16 pb-12 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
+    <div class="bg-asika-dark text-white px-6 pt-16 pb-12 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         <!-- Décoration en arrière-plan -->
         <div class="absolute -top-10 -right-10 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
 
@@ -65,7 +67,7 @@ $stats = [
                 <div class="w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-[2rem] flex items-center justify-center text-4xl font-black shadow-xl shadow-orange-500/20 border-4 border-white/10 text-white">
                     <?php echo substr($user_db['full_name'], 0, 1); ?>
                 </div>
-                <div class="absolute -bottom-2 -right-2 bg-slate-900 border-4 border-orion-dark px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                <div class="absolute -bottom-2 -right-2 bg-slate-900 border-4 border-asika-dark px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
                     <i data-lucide="zap" class="w-3 h-3 text-orange-400 fill-orange-400"></i>
                     <span class="text-[10px] font-black text-white"><?php echo $user_db['level']; ?></span>
                 </div>

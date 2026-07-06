@@ -1,6 +1,6 @@
 <?php
-$host = 'localhost';
-$db   = 'code_orion_labs';
+$host = '127.0.0.1';
+$db   = 'code_asika';
 $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';

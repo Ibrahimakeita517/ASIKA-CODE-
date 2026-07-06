@@ -6,13 +6,14 @@ if (!isset($_SESSION['user_id'])) { redirect('../login.php'); }
 
 $user_id = $_SESSION['user_id'];
 
-// Récupérer les leçons qui ont un quiz (toutes les leçons dans notre cas)
+// Récupérer les leçons et l'état de complétion en UNE SEULE requête (Optimisation 0 seconde)
 $stmt = $pdo->prepare("
     SELECT l.*, p.title as path_title,
-    (SELECT COUNT(*) FROM user_progress WHERE user_id = ? AND lesson_id = l.id) as is_completed
+           (up.id IS NOT NULL) as is_completed
     FROM lessons l
     JOIN modules m ON l.module_id = m.id
     JOIN paths p ON m.path_id = p.id
+    LEFT JOIN user_progress up ON up.lesson_id = l.id AND up.user_id = ?
     ORDER BY p.title, l.order_index
 ");
 $stmt->execute([$user_id]);
@@ -23,7 +24,7 @@ $quizzes = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Défis - CODE ORION LABS</title>
+    <title>Mes Défis - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>

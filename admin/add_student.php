@@ -13,6 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $stmt = $pdo->prepare("INSERT INTO users (full_name, email, username, password, role) VALUES (?, ?, ?, ?, 'learner')");
         $stmt->execute([$name, $email, $username, $password]);
+
+        log_activity($pdo, $_SESSION['user_id'], 'CREATION_ETUDIANT', "Nouvel étudiant créé : $name ($email)");
+
         $message = "<div class='bg-emerald-50 text-emerald-600 p-4 rounded-2xl mb-6 text-sm font-bold'>Élève ajouté avec succès !</div>";
     } catch (Exception $e) {
         $message = "<div class='bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm font-bold'>Erreur : Cet email ou nom d'utilisateur existe déjà.</div>";

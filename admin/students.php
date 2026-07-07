@@ -76,6 +76,12 @@ $students = $stmt->fetchAll();
                 </td>
                 <td class="px-8 py-5">
                     <div class="flex justify-end gap-2">
+                        <a href="student_activities.php?id=<?php echo $s['id']; ?>" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all" title="Voir les activités">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </a>
+                        <a href="login_as.php?id=<?php echo $s['id']; ?>" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Se connecter en tant que">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </a>
                         <a href="edit_student.php?id=<?php echo $s['id']; ?>" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-orange-50 hover:text-orange-600 transition-all" title="Modifier">
                             <i data-lucide="edit-3" class="w-4 h-4"></i>
                         </a>

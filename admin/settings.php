@@ -43,9 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button class="w-full text-left px-6 py-4 rounded-2xl bg-white text-slate-400 font-bold text-sm hover:bg-gray-50 transition-all">
                 Sécurité & MDP
             </button>
-            <button class="w-full text-left px-6 py-4 rounded-2xl bg-white text-slate-400 font-bold text-sm hover:bg-gray-50 transition-all">
-                Notifications
-            </button>
         </div>
 
         <!-- Formulaire -->

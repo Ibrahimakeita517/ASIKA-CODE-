@@ -19,6 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role'] = $user['role'];
             $_SESSION['full_name'] = $user['full_name'];
 
+            // Journal d'activité
+            log_activity($pdo, $user['id'], 'CONNEXION', 'Utilisateur connecté avec succès');
+
             if ($user['role'] === 'admin') {
                 redirect('admin/dashboard.php');
             } else {
@@ -39,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - CODE ASIKA</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -83,7 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="relative">
                     <input type="password" name="password" id="password" placeholder="••••••••" required
                         class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all placeholder:text-gray-400">
-                    <button type="button" class="absolute right-5 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">Voir</button>
+                    <button type="button" onclick="togglePassword('password', 'eye-icon')" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors">
+                        <i id="eye-icon" data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
 
@@ -101,5 +107,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
+    <script>
+        lucide.createIcons();
+
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

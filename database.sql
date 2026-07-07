@@ -45,6 +45,7 @@ CREATE TABLE lessons (
     title VARCHAR(150) NOT NULL,
     content LONGTEXT,
     audio_bambara_url VARCHAR(255),
+    video_url VARCHAR(255),
     xp_reward INT DEFAULT 10,
     duration_min INT DEFAULT 10,
     order_index INT,
@@ -87,4 +88,17 @@ CREATE INDEX idx_lesson_module ON lessons(module_id);
 CREATE INDEX idx_quiz_lesson ON quizzes(lesson_id);
 CREATE INDEX idx_option_quiz ON quiz_options(quiz_id);
 CREATE INDEX idx_user_progress_user ON user_progress(user_id);
+
+CREATE TABLE activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
+    ip_address VARCHAR(45),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_activity_logs_user ON activity_logs(user_id);
+CREATE INDEX idx_activity_logs_created ON activity_logs(created_at);
 

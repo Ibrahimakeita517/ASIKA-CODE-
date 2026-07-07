@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $pdo->prepare("UPDATE paths SET title = ?, description = ?, icon = ?, color_hex = ?, is_active = ? WHERE id = ?");
     if ($stmt->execute([$title, $description, $icon, $color_hex, $is_active, $id])) {
+        log_activity($pdo, $_SESSION['user_id'], 'MODIFICATION_PARCOURS', "Parcours modifié : $title");
         $message = "<div class='bg-emerald-50 text-emerald-600 p-4 rounded-2xl mb-6 text-sm font-bold'>Parcours mis à jour avec succès !</div>";
         // Refresh local data
         $stmt = $pdo->prepare("SELECT * FROM paths WHERE id = ?");

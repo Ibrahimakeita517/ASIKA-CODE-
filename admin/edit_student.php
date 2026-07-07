@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($result) {
+        log_activity($pdo, $_SESSION['user_id'], 'MODIFICATION_ETUDIANT', "Étudiant modifié : $name ($email)");
         $message = "<div class='bg-emerald-50 text-emerald-600 p-4 rounded-2xl mb-6 text-sm font-bold'>Modifications enregistrées !</div>";
         // Rafraîchir les données locales
         $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
@@ -93,7 +94,12 @@ require_once 'header.php';
 
             <div>
                 <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
-                <input type="password" name="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-orange-500/10 outline-none transition-all">
+                <div class="relative">
+                    <input type="password" name="password" id="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-orange-500/10 outline-none transition-all">
+                    <button type="button" onclick="togglePassword('password', 'eye-icon')" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors">
+                        <i id="eye-icon" data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-5 rounded-2xl shadow-lg shadow-orange-600/20 transition-all uppercase tracking-widest text-sm mt-4">
@@ -102,5 +108,21 @@ require_once 'header.php';
         </form>
     </div>
 </div>
+
+<script>
+function togglePassword(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const eyeIcon = document.getElementById(iconId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+    }
+    lucide.createIcons();
+}
+</script>
 
 <?php require_once 'footer.php'; ?>

@@ -12,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($title)) {
         $stmt = $pdo->prepare("INSERT INTO paths (title, description, icon, color_hex, is_active) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$title, $description, $icon, $color_hex, $is_active]);
+
+        log_activity($pdo, $_SESSION['user_id'], 'CREATION_PARCOURS', "Nouveau parcours créé : $title");
+
         header('Location: courses.php?success=1');
         exit;
     }

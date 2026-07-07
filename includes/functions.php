@@ -62,6 +62,15 @@ function add_user_xp($pdo, $user_id, $xp_to_add) {
 }
 
 /**
+ * Enregistre une activité dans le journal
+ */
+function log_activity($pdo, $user_id, $action, $details = null) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, details, ip_address) VALUES (?, ?, ?, ?)");
+    return $stmt->execute([$user_id, $action, $details, $ip]);
+}
+
+/**
  * Formate les nombres pour les stats (ex: 2 400)
  */
 function format_stat($number) {

@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($path_id) && !empty($title)) {
         $stmt = $pdo->prepare("INSERT INTO modules (path_id, title, order_index) VALUES (?, ?, ?)");
         $stmt->execute([$path_id, $title, $order_index]);
+
+        log_activity($pdo, $_SESSION['user_id'], 'CREATION_MODULE', "Nouveau module créé : $title");
+
         header('Location: courses.php?success=module_added');
         exit;
     }

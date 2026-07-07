@@ -153,16 +153,6 @@ $stats = [
             <div class="space-y-1">
                 <a href="#" class="flex items-center justify-between p-5 hover:bg-white/5 rounded-[1.8rem] transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition-all">
-                            <i data-lucide="bell" class="w-5 h-5"></i>
-                        </div>
-                        <span class="text-sm font-bold text-slate-200">Notifications</span>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-white transition-all"></i>
-                </a>
-
-                <a href="#" class="flex items-center justify-between p-5 hover:bg-white/5 rounded-[1.8rem] transition-all group">
-                    <div class="flex items-center gap-4">
                         <div class="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
                             <i data-lucide="languages" class="w-5 h-5"></i>
                         </div>

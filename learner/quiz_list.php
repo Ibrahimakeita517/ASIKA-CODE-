@@ -18,22 +18,10 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $quizzes = $stmt->fetchAll();
+
+$page_title = "Mes Défis";
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Défis - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
-        .quiz-card { transition: all 0.3s ease; }
-        .quiz-card:hover { transform: scale(1.02); }
-    </style>
-</head>
 <body class="pb-32">
 
     <div class="px-6 pt-16 pb-8">
@@ -49,7 +37,7 @@ $quizzes = $stmt->fetchAll();
             </div>
         <?php else: ?>
             <?php foreach($quizzes as $q): ?>
-            <a href="quiz.php?id=<?php echo $q['id']; ?>" class="quiz-card block bg-white p-6 rounded-[2.2rem] shadow-xl shadow-slate-200/50 border border-slate-100 group transition-all">
+            <a href="quiz.php?id=<?php echo $q['id']; ?>&from=challenges" class="quiz-card block bg-white p-6 rounded-[2.2rem] shadow-xl shadow-slate-200/50 border border-slate-100 group transition-all">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-5">
                         <div class="w-14 h-14 <?php echo $q['is_completed'] ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-slate-900 text-white shadow-slate-900/20'; ?> rounded-2xl flex items-center justify-center shadow-lg transition-colors group-hover:bg-orange-500 group-hover:shadow-orange-500/30">

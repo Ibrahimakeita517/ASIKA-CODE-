@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Gestion de l'upload Audio
     if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === 0) {
-        $allowed = ['mp3', 'wav', 'ogg', 'm4a'];
+        $allowed = ['mp3', 'wav', 'ogg', 'm4a', 'webm'];
         $ext = pathinfo($_FILES['audio_file']['name'], PATHINFO_EXTENSION);
         if (in_array(strtolower($ext), $allowed)) {
             $newName = 'audio_' . time() . '_' . uniqid() . '.' . $ext;
@@ -134,19 +134,41 @@ require_once 'header.php';
             <div>
                 <label class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 mb-4">
                     <i data-lucide="mic" class="w-4 h-4 text-orange-600"></i>
-                    Audio actuel (Bambara)
+                    Audio (Bambara)
                 </label>
                 <?php if ($lesson['audio_bambara_url']): ?>
                     <p class="text-[10px] text-emerald-600 font-bold mb-2 flex items-center gap-1">
                         <i data-lucide="check-circle" class="w-3 h-3"></i> Fichier présent : <?php echo basename($lesson['audio_bambara_url']); ?>
                     </p>
                 <?php endif; ?>
-                <div class="relative">
-                    <input type="file" name="audio_file" accept="audio/*" class="hidden" id="audio_input" onchange="updateFileName(this, 'audio_name')">
-                    <label for="audio_input" class="flex flex-col items-center justify-center w-full h-24 bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-500 hover:bg-orange-50/30 cursor-pointer transition-all group">
-                        <span id="audio_name" class="text-[10px] font-bold text-gray-400 group-hover:text-orange-600 uppercase">Remplacer l'Audio</span>
-                    </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Upload classique -->
+                    <div class="relative">
+                        <input type="file" name="audio_file" accept="audio/*" class="hidden" id="audio_input" onchange="updateFileName(this, 'audio_name')">
+                        <label for="audio_input" class="flex flex-col items-center justify-center w-full h-24 bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-500 hover:bg-orange-50/30 cursor-pointer transition-all group">
+                            <span id="audio_name" class="text-[10px] font-bold text-gray-400 group-hover:text-orange-600 uppercase text-center px-4">Remplacer Audio</span>
+                        </label>
+                    </div>
+
+                    <!-- Enregistrement Direct -->
+                    <div class="relative h-24">
+                        <div id="record_btn" class="flex flex-col items-center justify-center w-full h-full bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-red-500 hover:bg-red-50/30 cursor-pointer transition-all group">
+                            <i data-lucide="mic" class="w-5 h-5 text-gray-300 group-hover:text-red-500 mb-1"></i>
+                            <span id="record_status" class="text-[10px] font-bold text-gray-400 group-hover:text-red-600 uppercase">Enregistrer Direct</span>
+                        </div>
+
+                        <!-- UI d'enregistrement active -->
+                        <div id="recording_ui" class="hidden absolute inset-0 bg-red-600 rounded-2xl flex flex-col items-center justify-center text-white z-10 animate-pulse">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                                <span id="record_timer" class="font-mono font-black text-lg">00:00</span>
+                            </div>
+                            <button type="button" id="stop_btn" class="bg-white text-red-600 px-3 py-0.5 rounded-full text-[9px] font-black uppercase">Arrêter</button>
+                        </div>
+                    </div>
                 </div>
+                <audio id="audio_preview" controls class="hidden w-full h-10 mt-4 bg-gray-50 rounded-xl"></audio>
             </div>
         </div>
 
@@ -188,6 +210,83 @@ function updateFileName(input, targetId) {
         document.getElementById(targetId).classList.remove('text-gray-400');
         document.getElementById(targetId).classList.add('text-orange-600');
     }
+}
+
+// Logique d'enregistrement audio
+let mediaRecorder;
+let audioChunks = [];
+let startTime;
+let timerInterval;
+
+const recordBtn = document.getElementById('record_btn');
+const stopBtn = document.getElementById('stop_btn');
+const recordingUI = document.getElementById('recording_ui');
+const recordTimer = document.getElementById('record_timer');
+const audioInput = document.getElementById('audio_input');
+const audioName = document.getElementById('audio_name');
+const audioPreview = document.getElementById('audio_preview');
+
+if (recordBtn) {
+    recordBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioPreview.src = audioUrl;
+                audioPreview.classList.remove('hidden');
+
+                // Créer un fichier à partir du blob pour l'input
+                const file = new File([audioBlob], "enregistrement_" + Date.now() + ".webm", { type: 'audio/webm' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                audioInput.files = dataTransfer.files;
+
+                audioName.textContent = "ENREGISTREMENT PRÊT";
+                audioName.classList.remove('text-gray-400');
+                audioName.classList.add('text-orange-600');
+
+                // Arrêter les pistes du micro
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            recordingUI.classList.remove('hidden');
+            startTime = Date.now();
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+
+        } catch (err) {
+            console.error("Erreur micro:", err);
+            alert("Impossible d'accéder au micro. Vérifiez les permissions.");
+        }
+    });
+}
+
+if (stopBtn) {
+    stopBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            recordingUI.classList.add('hidden');
+            clearInterval(timerInterval);
+        }
+    });
+}
+
+function updateTimer() {
+    const now = Date.now();
+    const diff = Math.floor((now - startTime) / 1000);
+    const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+    const secs = (diff % 60).toString().padStart(2, '0');
+    recordTimer.textContent = `${mins}:${secs}`;
 }
 </script>
 

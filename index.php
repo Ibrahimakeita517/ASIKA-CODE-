@@ -20,7 +20,7 @@
         </div>
 
         <!-- Typography -->
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+        <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6">
             CODE <span class="text-asika-orange">ASIKA</span>
         </h1>
 
@@ -29,8 +29,8 @@
         </p>
 
         <!-- Action Area -->
-        <div class="w-full max-w-sm space-y-6">
-            <a href="login.php" class="group relative block w-full">
+        <div class="w-full max-w-sm space-y-6 px-4">
+            <a href="login.php" class="group relative block w-full active:scale-95 transition-transform">
                 <div class="absolute -inset-0.5 bg-asika-orange rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
                 <div class="relative flex items-center justify-center bg-asika-orange hover:bg-orange-600 text-white font-semibold py-5 rounded-2xl transition-all">
                     <span>Accéder à mon espace</span>

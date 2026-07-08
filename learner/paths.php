@@ -16,7 +16,6 @@ $stmt = $pdo->prepare("
     LEFT JOIN modules m ON m.path_id = p.id
     LEFT JOIN lessons l ON l.module_id = m.id
     LEFT JOIN user_progress up ON up.lesson_id = l.id AND up.user_id = ?
-    WHERE p.is_active = 1
     GROUP BY p.id
 ");
 $stmt->execute([$user_id]);
@@ -36,25 +35,13 @@ foreach ($paths_db as $p) {
         'progress' => $progress,
         'color' => ($p['id'] % 2 == 0) ? 'from-emerald-900 via-emerald-800 to-teal-900' : 'from-blue-600 to-indigo-900',
         'status' => $progress > 0 ? 'En cours' : 'Nouveau',
-        'available' => true
+        'is_active' => (bool)$p['is_active']
     ];
 }
+
+$page_title = "Parcours";
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcours - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
-        .path-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .path-card:hover { transform: translateY(-8px); shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-    </style>
-</head>
 <body class="pb-32">
 
     <div class="px-6 pt-16 pb-10 flex justify-between items-center">
@@ -75,46 +62,67 @@ foreach ($paths_db as $p) {
             </div>
         <?php else: ?>
             <?php foreach($paths as $path): ?>
-            <div class="path-card relative overflow-hidden rounded-[3rem] p-8 text-white bg-slate-900 shadow-2xl shadow-slate-900/20">
+            <div class="path-card relative overflow-hidden rounded-[3rem] p-8 text-white <?php echo $path['is_active'] ? 'bg-slate-900' : 'bg-slate-100 border-2 border-slate-200 shadow-none'; ?> shadow-2xl shadow-slate-900/20">
                 <!-- Décoration Subtle -->
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl"></div>
+                <?php if($path['is_active']): ?>
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl"></div>
+                <?php endif; ?>
 
                 <div class="flex justify-between items-start mb-8 relative z-10">
-                    <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-[1.5rem] flex items-center justify-center shadow-inner">
-                        <i data-lucide="<?php echo ($path['id'] % 2 == 0) ? 'database' : 'layout'; ?>" class="w-8 h-8 text-orange-400"></i>
+                    <div class="w-16 h-16 <?php echo $path['is_active'] ? 'bg-white/10' : 'bg-slate-200'; ?> backdrop-blur-md rounded-[1.5rem] flex items-center justify-center shadow-inner">
+                        <i data-lucide="<?php echo $path['is_active'] ? (($path['id'] % 2 == 0) ? 'database' : 'layout') : 'lock'; ?>" class="w-8 h-8 <?php echo $path['is_active'] ? 'text-orange-400' : 'text-slate-400'; ?>"></i>
                     </div>
-                    <div class="bg-orange-500 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg shadow-orange-500/30">
-                        <?php echo $path['status']; ?>
-                    </div>
+                    <?php if($path['is_active']): ?>
+                        <div class="bg-orange-500 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg shadow-orange-500/30">
+                            <?php echo $path['status']; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="bg-slate-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em]">
+                            Indisponible
+                        </div>
+                    <?php endif; ?>
                 </div>
 
-                <h2 class="text-2xl font-black mb-3 leading-tight"><?php echo htmlspecialchars($path['title']); ?></h2>
-                <p class="text-slate-400 text-sm mb-8 font-medium leading-relaxed"><?php echo htmlspecialchars($path['subtitle']); ?></p>
+                <h2 class="text-2xl font-black mb-3 leading-tight <?php echo $path['is_active'] ? 'text-white' : 'text-slate-400'; ?>"><?php echo htmlspecialchars($path['title']); ?></h2>
+                <p class="<?php echo $path['is_active'] ? 'text-slate-400' : 'text-slate-300'; ?> text-sm mb-8 font-medium leading-relaxed">
+                    <?php if($path['is_active']): ?>
+                        <?php echo htmlspecialchars($path['subtitle']); ?>
+                    <?php else: ?>
+                        Cette formation est indisponible pour le moment. Nos équipes travaillent dessus pour vous offrir la meilleure expérience possible.
+                    <?php endif; ?>
+                </p>
 
-                <!-- Stats Pro -->
-                <div class="flex gap-8 mb-10 border-t border-white/5 pt-6">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-slate-500"></i>
-                        <span class="text-sm font-bold"><?php echo $path['modules']; ?> <span class="text-slate-500 font-medium">Modules</span></span>
+                <?php if($path['is_active']): ?>
+                    <!-- Stats Pro -->
+                    <div class="flex gap-8 mb-10 border-t border-white/5 pt-6">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="layers" class="w-4 h-4 text-slate-500"></i>
+                            <span class="text-sm font-bold"><?php echo $path['modules']; ?> <span class="text-slate-500 font-medium">Modules</span></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
+                            <span class="text-sm font-bold"><?php echo $path['duration']; ?></span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="clock" class="w-4 h-4 text-slate-500"></i>
-                        <span class="text-sm font-bold"><?php echo $path['duration']; ?></span>
-                    </div>
-                </div>
 
-                <!-- Progress Bar Mature -->
-                <div class="flex items-center gap-4">
-                    <div class="flex-1 bg-white/5 h-2.5 rounded-full overflow-hidden border border-white/5">
-                        <div class="bg-orange-500 h-full rounded-full transition-all duration-1000" style="width: <?php echo $path['progress']; ?>%"></div>
+                    <!-- Progress Bar Mature -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1 bg-white/5 h-2.5 rounded-full overflow-hidden border border-white/5">
+                            <div class="bg-orange-500 h-full rounded-full transition-all duration-1000" style="width: <?php echo $path['progress']; ?>%"></div>
+                        </div>
+                        <span class="text-white font-black text-xs"><?php echo $path['progress']; ?>%</span>
                     </div>
-                    <span class="text-white font-black text-xs"><?php echo $path['progress']; ?>%</span>
-                </div>
 
-                <a href="course_details.php?id=<?php echo $path['id']; ?>" class="mt-8 w-full bg-white text-slate-900 font-bold py-4 rounded-[1.5rem] flex items-center justify-center gap-2 hover:bg-orange-500 hover:text-white transition-all group">
-                    <?php echo $path['progress'] > 0 ? 'Reprendre' : 'Commencer le voyage'; ?>
-                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                </a>
+                    <a href="course_details.php?id=<?php echo $path['id']; ?>" class="mt-8 w-full bg-white text-slate-900 font-bold py-4 rounded-[1.5rem] flex items-center justify-center gap-2 hover:bg-orange-500 hover:text-white transition-all group">
+                        <?php echo $path['progress'] > 0 ? 'Reprendre' : 'Commencer le voyage'; ?>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                <?php else: ?>
+                    <div class="mt-8 w-full bg-slate-200 text-slate-400 font-bold py-4 rounded-[1.5rem] flex items-center justify-center gap-2 cursor-not-allowed">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                        Revenez bientôt
+                    </div>
+                <?php endif; ?>
             </div>
             <?php endforeach; ?>
         <?php endif; ?>

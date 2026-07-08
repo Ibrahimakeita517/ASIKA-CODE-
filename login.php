@@ -34,38 +34,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Veuillez remplir tous les champs.";
     }
 }
+
+$page_title = "Connexion";
+include 'includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .asika-shadow { shadow-offset: 0px 4px; shadow-color: rgba(0,0,0,0.05); }
-    </style>
-</head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6 md:p-4 -webkit-tap-highlight-color-transparent">
 
     <!-- Logo -->
-    <div class="mb-8 text-center">
-        <div class="w-12 h-12 bg-orange-500 rounded-xl mx-auto flex items-center justify-center mb-3 shadow-lg shadow-orange-500/20">
+    <div class="mb-6 md:mb-8 text-center active:scale-95 transition-transform">
+        <div class="w-14 h-14 bg-orange-500 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg shadow-orange-500/20">
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
         </div>
-        <h1 class="text-xl font-bold text-slate-900">CODE <span class="text-orange-600">ASIKA</span></h1>
-        <p class="text-xs text-gray-500 font-medium">La plateforme d'apprentissage du code</p>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">CODE <span class="text-orange-600">ASIKA</span></h1>
     </div>
 
     <!-- Login Card -->
-    <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100">
-        <h2 class="text-3xl font-bold text-slate-900 mb-2">Connexion</h2>
-        <p class="text-gray-500 mb-8">Apprenez à votre propre rythme.</p>
+    <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/50 border border-gray-100">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">Bon retour !</h2>
+        <p class="text-slate-400 text-sm mb-8">Heureux de vous revoir parmi nous.</p>
 
         <?php if ($error): ?>
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm">
@@ -101,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="#" class="text-orange-600 font-semibold hover:text-orange-700">Mot de passe oublié ?</a>
             </div>
 
-            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-600/20 transition-all transform active:scale-[0.98]">
-                Se connecter
+            <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-lg shadow-slate-900/20 transition-all transform active:scale-[0.96] uppercase tracking-widest text-xs">
+                Continuer l'aventure
             </button>
         </form>
     </div>

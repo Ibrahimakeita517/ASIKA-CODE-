@@ -32,6 +32,7 @@ $all_data = $stmt->fetchAll();
 $modules = [];
 $total_lessons = 0;
 $completed_lessons = 0;
+$previous_lesson_completed = true; // La première leçon est toujours débloquée
 
 foreach ($all_data as $row) {
     $m_id = $row['module_id'];
@@ -46,33 +47,30 @@ foreach ($all_data as $row) {
 
     if ($row['lesson_id']) {
         $total_lessons++;
-        if ($row['is_completed']) $completed_lessons++;
+        $is_completed = (bool)$row['is_completed'];
+        if ($is_completed) $completed_lessons++;
+
+        // Une leçon est débloquée si elle est déjà complétée OU si la précédente l'est
+        $is_unlocked = $is_completed || $previous_lesson_completed;
 
         $modules[$m_id]['lessons'][] = [
             'id' => $row['lesson_id'],
             'title' => $row['lesson_title'],
             'duration' => $row['duration_min'] . ' min',
-            'status' => $row['is_completed'] ? 'completed' : 'current'
+            'status' => $is_completed ? 'completed' : ($is_unlocked ? 'current' : 'locked'),
+            'is_unlocked' => $is_unlocked
         ];
+
+        // Pour la prochaine itération
+        $previous_lesson_completed = $is_completed;
     }
 }
 
 $progress_pct = $total_lessons > 0 ? round(($completed_lessons / $total_lessons) * 100) : 0;
+
+$page_title = $course['title'];
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($course['title']); ?> - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
-        .module-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    </style>
-</head>
 <body class="pb-32 bg-slate-50/50">
 
     <!-- Header Mature -->
@@ -129,25 +127,33 @@ $progress_pct = $total_lessons > 0 ? round(($completed_lessons / $total_lessons)
 
             <div class="divide-y divide-slate-50">
                 <?php foreach($module['lessons'] as $lesson): ?>
-                <a href="lesson.php?id=<?php echo $lesson['id']; ?>"
-                   class="flex items-center gap-5 p-6 hover:bg-slate-50 transition-all group">
+                <?php if($lesson['is_unlocked']): ?>
+                    <a href="lesson.php?id=<?php echo $lesson['id']; ?>"
+                       class="flex items-center gap-4 md:gap-5 p-5 md:p-6 hover:bg-slate-50 active:bg-slate-100 active:scale-[0.98] transition-all group">
+                <?php else: ?>
+                    <div class="flex items-center gap-4 md:gap-5 p-5 md:p-6 opacity-50 cursor-not-allowed">
+                <?php endif; ?>
 
                     <div class="shrink-0">
                         <?php if($lesson['status'] == 'completed'): ?>
                             <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <i data-lucide="check" class="w-5 h-5"></i>
                             </div>
-                        <?php else: ?>
+                        <?php elseif($lesson['status'] == 'current'): ?>
                             <div class="w-10 h-10 rounded-2xl bg-white border-2 border-slate-100 flex items-center justify-center text-slate-300 group-hover:border-orange-500 group-hover:text-orange-500 transition-all">
                                 <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        <?php else: ?>
+                            <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center border border-slate-200">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
                             </div>
                         <?php endif; ?>
                     </div>
 
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">
-                            <h4 class="text-base font-bold text-slate-800 group-hover:text-slate-900 transition-colors"><?php echo htmlspecialchars($lesson['title']); ?></h4>
-                            <?php if($lesson['status'] == 'current' && !$completed_lessons): ?>
+                            <h4 class="text-base font-bold text-slate-800 <?php echo $lesson['is_unlocked'] ? 'group-hover:text-slate-900' : 'text-slate-400'; ?> transition-colors"><?php echo htmlspecialchars($lesson['title']); ?></h4>
+                            <?php if($lesson['status'] == 'current' && $lesson['is_unlocked']): ?>
                                 <span class="bg-orange-500 text-[8px] text-white px-2 py-0.5 rounded-lg font-black uppercase tracking-widest shadow-sm shadow-orange-500/20">Nouveau</span>
                             <?php endif; ?>
                         </div>
@@ -159,10 +165,17 @@ $progress_pct = $total_lessons > 0 ? round(($completed_lessons / $total_lessons)
                         </div>
                     </div>
 
-                    <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                    <?php if($lesson['is_unlocked']): ?>
+                        <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                    <?php endif; ?>
+
+                <?php if($lesson['is_unlocked']): ?>
+                    </a>
+                <?php else: ?>
                     </div>
-                </a>
+                <?php endif; ?>
                 <?php endforeach; ?>
             </div>
         </div>

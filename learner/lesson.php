@@ -4,13 +4,14 @@ require_once '../includes/functions.php';
 
 if (!isset($_SESSION['user_id'])) { redirect('../login.php'); }
 
+$user_id = $_SESSION['user_id'];
 $lesson_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($lesson_id <= 0) {
     redirect('paths.php');
 }
 
-// Récupération de la leçon depuis la base de données
+// Récupération de la leçon avec vérification de déblocage
 $stmt = $pdo->prepare("
     SELECT l.*, m.title as module_title, m.path_id, p.title as path_title
     FROM lessons l
@@ -23,6 +24,29 @@ $lesson = $stmt->fetch();
 
 if (!$lesson) {
     redirect('paths.php');
+}
+
+// Sécurité : Vérifier si la leçon est débloquée
+$stmt = $pdo->prepare("
+    SELECT l.id
+    FROM lessons l
+    JOIN modules m ON l.module_id = m.id
+    WHERE m.path_id = ? AND l.order_index < ?
+    ORDER BY l.order_index DESC
+    LIMIT 1
+");
+$stmt->execute([$lesson['path_id'], $lesson['order_index']]);
+$previous_lesson = $stmt->fetch();
+
+if ($previous_lesson) {
+    $stmt = $pdo->prepare("SELECT id FROM user_progress WHERE user_id = ? AND lesson_id = ?");
+    $stmt->execute([$user_id, $previous_lesson['id']]);
+    $is_unlocked = $stmt->fetch();
+
+    if (!$is_unlocked) {
+        // Rediriger vers les détails du parcours si tentative d'accès à une leçon verrouillée
+        redirect("course_details.php?id=" . $lesson['path_id']);
+    }
 }
 
 // Récupération du total des leçons du parcours pour la barre de progression
@@ -44,24 +68,11 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$lesson['path_id'], $lesson['order_index']]);
 $current_pos = $stmt->fetchColumn();
+
+$page_title = $lesson['title'];
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($lesson['title']); ?> - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; }
-        .code-font { font-family: 'Fira Code', monospace; }
-        .custom-audio-player { background: #0F172A; border-radius: 2rem; }
-        .prose h2 { font-weight: 800; color: #0F172A; }
-    </style>
-</head>
-<body class="pb-32 bg-slate-50/30">
+<body class="pb-32 bg-slate-50/30 overflow-x-hidden">
 
     <!-- Top Navigation Mature -->
     <div class="px-6 pt-10 pb-6 flex items-center gap-4 sticky top-0 bg-white/80 backdrop-blur-xl z-50 border-b border-slate-100">
@@ -92,8 +103,18 @@ $current_pos = $stmt->fetchColumn();
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 border border-slate-100 mb-10">
-            <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed text-lg">
+        <div class="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 mb-10 overflow-hidden">
+            <?php if ($lesson['video_url']): ?>
+                <!-- Lecteur Vidéo Natif -->
+                <div class="mb-8 rounded-[1.5rem] overflow-hidden bg-black aspect-video shadow-lg">
+                    <video controls class="w-full h-full object-cover">
+                        <source src="../<?php echo htmlspecialchars($lesson['video_url']); ?>" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
+                </div>
+            <?php endif; ?>
+
+            <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed text-base md:text-lg break-all">
                 <?php echo $lesson['content']; ?>
             </div>
         </div>

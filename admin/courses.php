@@ -97,13 +97,19 @@ $lessons = $stmt_lessons->fetchAll();
                     <td class="px-8 py-6 text-center text-sm font-bold text-slate-600"><?php echo $c['total_lessons']; ?></td>
                     <td class="px-8 py-6 text-center text-sm font-bold text-slate-600"><?php echo $c['total_students']; ?></td>
                     <td class="px-8 py-6">
-                        <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest <?php echo $c['is_active'] ? 'text-emerald-500' : 'text-gray-400'; ?>">
+                        <a href="toggle_path.php?id=<?php echo $c['id']; ?>" class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest <?php echo $c['is_active'] ? 'text-emerald-500 hover:text-emerald-600' : 'text-gray-400 hover:text-slate-600'; ?> transition-colors">
                             <span class="w-1.5 h-1.5 rounded-full <?php echo $c['is_active'] ? 'bg-emerald-500' : 'bg-gray-400'; ?>"></span>
                             <?php echo $c['is_active'] ? 'Actif' : 'Désactivé'; ?>
-                        </span>
+                            <i data-lucide="refresh-cw" class="w-3 h-3 ml-1"></i>
+                        </a>
                     </td>
                     <td class="px-8 py-6">
                         <div class="flex justify-center gap-2">
+                            <a href="toggle_path.php?id=<?php echo $c['id']; ?>"
+                               title="<?php echo $c['is_active'] ? 'Désactiver' : 'Activer'; ?>"
+                               class="w-8 h-8 rounded-lg flex items-center justify-center transition-all <?php echo $c['is_active'] ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600'; ?>">
+                                <i data-lucide="<?php echo $c['is_active'] ? 'eye' : 'eye-off'; ?>" class="w-4 h-4"></i>
+                            </a>
                             <a href="edit_course.php?id=<?php echo $c['id']; ?>" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all"><i data-lucide="edit-3" class="w-4 h-4"></i></a>
                             <a href="delete_course.php?id=<?php echo $c['id']; ?>" onclick="return confirm('Supprimer ce parcours ?')" class="w-8 h-8 rounded-lg bg-gray-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></a>
                         </div>

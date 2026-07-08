@@ -26,6 +26,11 @@ $stmt = $pdo->prepare("SELECT is_correct FROM quiz_options WHERE quiz_id = ? AND
 $stmt->execute([$quiz_id, $answer]);
 $is_correct = (bool)$stmt->fetchColumn();
 
+// Récupérer la bonne réponse pour le feedback
+$stmt_correct = $pdo->prepare("SELECT option_letter FROM quiz_options WHERE quiz_id = ? AND is_correct = 1");
+$stmt_correct->execute([$quiz_id]);
+$correct_answer = $stmt_correct->fetchColumn();
+
 $level_up_data = null;
 
 // Si c'est la dernière question et que c'est juste, on valide la leçon
@@ -50,6 +55,7 @@ if ($is_correct && $is_last && $lesson_id > 0) {
 echo json_encode([
     'success' => true,
     'correct' => $is_correct,
+    'correct_answer' => $correct_answer,
     'level_up' => $level_up_data ? $level_up_data['level_up'] : false,
     'new_level' => $level_up_data ? $level_up_data['new_level'] : null,
     'xp_reward' => $level_up_data ? $xp_reward : 0

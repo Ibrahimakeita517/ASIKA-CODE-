@@ -11,12 +11,52 @@ if ($lesson_id <= 0) {
 }
 
 // Récupération de la leçon pour le contexte
-$stmt = $pdo->prepare("SELECT * FROM lessons WHERE id = ?");
+$stmt = $pdo->prepare("
+    SELECT l.*, m.path_id, m.order_index as module_order
+    FROM lessons l
+    JOIN modules m ON l.module_id = m.id
+    WHERE l.id = ?
+");
 $stmt->execute([$lesson_id]);
 $lesson = $stmt->fetch();
 
 if (!$lesson) {
     redirect('paths.php');
+}
+
+// Trouver la leçon suivante (dans le même module ou le module suivant du même parcours)
+$stmt = $pdo->prepare("
+    SELECT l.id
+    FROM lessons l
+    JOIN modules m ON l.module_id = m.id
+    WHERE m.path_id = ?
+    AND (
+        (m.id = ? AND l.order_index > ?)
+        OR
+        (m.order_index > ?)
+    )
+    ORDER BY m.order_index ASC, l.order_index ASC
+    LIMIT 1
+");
+$stmt->execute([
+    $lesson['path_id'],
+    $lesson['module_id'],
+    $lesson['order_index'],
+    $lesson['module_order']
+]);
+$next_lesson = $stmt->fetch();
+
+// Détermination des URLs de redirection (LOGIQUE STRICTE)
+$from = $_GET['from'] ?? '';
+$safe_path_id = (int)$lesson['path_id'];
+
+if ($from === 'challenges') {
+    $next_url = "quiz_list.php";
+    $back_url = "quiz_list.php";
+} else {
+    // Si il y a une leçon suivante on y va, sinon on retourne obligatoirement aux détails du parcours (JAMAIS dashboard)
+    $next_url = $next_lesson ? "lesson.php?id=" . $next_lesson['id'] : "course_details.php?id=" . $safe_path_id;
+    $back_url = "lesson.php?id=" . $lesson_id;
 }
 
 // Récupération de TOUS les quiz pour cette leçon
@@ -51,30 +91,15 @@ if (empty($quizzes_data)) {
         ];
     }
 }
+
+$page_title = "Quiz : " . $lesson['title'];
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - <?php echo htmlspecialchars($lesson['title']); ?></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; }
-        .option-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .option-btn:active { transform: scale(0.98); }
-        .option-btn.correct { border-color: #10B981; background-color: #ECFDF5; }
-        .option-btn.wrong { border-color: #EF4444; background-color: #FEF2F2; }
-        .progress-bar { transition: width 0.4s ease-out; }
-    </style>
-</head>
 <body class="min-h-screen flex flex-col bg-slate-50">
 
     <!-- Top Bar -->
     <div class="px-6 pt-10 pb-6 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-50 border-b border-slate-100">
-        <a href="lesson.php?id=<?php echo $lesson_id; ?>" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl">
+        <a href="<?php echo $back_url; ?>" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl">
             <i data-lucide="x" class="w-5 h-5"></i>
         </a>
         <div class="flex-1 mx-6 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -117,6 +142,7 @@ if (empty($quizzes_data)) {
         let currentQuestionIndex = 0;
         let isAnswered = false;
         const lessonId = <?php echo $lesson_id; ?>;
+        const nextUrl = '<?php echo $next_url; ?>';
 
         function renderQuestion() {
             const container = document.getElementById('quiz-content');
@@ -140,16 +166,16 @@ if (empty($quizzes_data)) {
             });
 
             container.innerHTML = `
-                <div class="mb-10">
+                <div class="mb-8 md:mb-10">
                     <span class="inline-flex items-center gap-2 text-[10px] font-black text-orange-500 uppercase tracking-[0.25em] mb-4">
                         <i data-lucide="award" class="w-3 h-3"></i>
                         Question ${currentQuestionIndex + 1} sur ${questions.length}
                     </span>
-                    <h1 class="text-3xl font-black text-slate-900 leading-tight">
+                    <h1 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
                         ${q.question}
                     </h1>
                 </div>
-                <div class="space-y-4" id="options-container">
+                <div class="space-y-3 md:space-y-4" id="options-container">
                     ${optionsHtml}
                 </div>
             `;
@@ -207,14 +233,23 @@ if (empty($quizzes_data)) {
                     btn.querySelector('.letter-box').classList.replace('bg-slate-50', 'bg-red-500');
                     btn.querySelector('.letter-box').classList.replace('text-slate-400', 'text-white');
 
+                    // Montrer la bonne réponse en vert
+                    const allButtons = document.querySelectorAll('.option-btn');
+                    allButtons.forEach(b => {
+                        const letterBox = b.querySelector('.letter-box');
+                        const letter = letterBox.innerText.trim();
+                        if (letter === data.correct_answer) {
+                            b.classList.add('correct');
+                            letterBox.classList.replace('bg-slate-50', 'bg-emerald-500');
+                            letterBox.classList.replace('text-slate-400', 'text-white');
+                        }
+                    });
+
                     feedbackTitle.innerText = "Pas tout à fait...";
-                    btnText.innerText = "Réessayer";
+                    btnText.innerText = "Continuer";
                     feedbackIconContainer.className = "w-16 h-16 bg-red-500 text-white rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-red-500/30";
                     feedbackIcon.setAttribute('data-lucide', 'alert-circle');
                     xpContainer.classList.add('hidden');
-
-                    // On permet de réessayer en remettant isAnswered à false après un délai ou au clic sur le bouton
-                    // Ici on va laisser l'utilisateur cliquer sur Continuer pour masquer le feedback et rejouer
                 }
 
                 lucide.createIcons();
@@ -243,7 +278,7 @@ if (empty($quizzes_data)) {
                 setTimeout(renderQuestion, 500);
             } else {
                 // Si c'était la dernière question juste
-                window.location.href = 'dashboard.php';
+                window.location.href = nextUrl;
             }
         });
 

@@ -73,6 +73,10 @@ include 'header.php';
                                     <?php echo htmlspecialchars($q['question']); ?>
                                 </h4>
                                 <div class="flex gap-2">
+                                    <a href="edit_quiz_question.php?id=<?php echo $q['id']; ?>&lesson_id=<?php echo $lesson_id; ?>"
+                                       class="text-gray-300 hover:text-orange-500 transition-colors">
+                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    </a>
                                     <a href="delete_quiz_question.php?id=<?php echo $q['id']; ?>&lesson_id=<?php echo $lesson_id; ?>"
                                        onclick="return confirm('Supprimer cette question ?')"
                                        class="text-gray-300 hover:text-red-500 transition-colors">

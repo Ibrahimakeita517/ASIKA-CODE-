@@ -22,6 +22,10 @@ CREATE TABLE users (
 INSERT INTO users (full_name, username, email, password, role)
 VALUES ('Ibrahima Keita', 'ibrahima', 'ibrahimakeita24@icloud.com', '$2y$10$x0LAncxVO6J9ar8PU2J6QOL4ibU9Wy097PgRJAJmxLDtEKEI8oVa2', 'admin');
 
+-- Ajout de Moussa Coulibaly (Admin)
+INSERT INTO users (full_name, username, email, password, role)
+VALUES ('Moussa Coulibaly', 'moussa', 'moussacoulibaly99@icloud.com', '$2y$10$lWzkIUNUvurUGbeFb6oT4OZzwzKWtOSaXN7RYQ7wbWuOUFVBD4nKW', 'admin');
+
 CREATE TABLE paths (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,

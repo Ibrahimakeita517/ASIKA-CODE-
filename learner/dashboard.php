@@ -30,23 +30,10 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute();
 $current_lesson = $stmt->fetch();
+
+$page_title = "Tableau de bord";
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .bg-asika-dark { background-color: #0B0E14; }
-        .bg-asika-card { background-color: #161B22; }
-        .text-asika-orange { color: #FF6B00; }
-        .bg-asika-orange { background-color: #FF6B00; }
-    </style>
-</head>
 <body class="bg-white min-h-screen pb-24">
 
     <!-- Header / User Info (Dark Top) -->
@@ -140,21 +127,20 @@ $current_lesson = $stmt->fetch();
         </div>
         <?php endif; ?>
 
-        <!-- Grid Stats Professionnelle -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div class="grid grid-cols-2 gap-3 md:gap-4 mb-8">
+            <div class="bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm active:scale-95 transition-transform">
                 <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
                     <i data-lucide="check-circle-2" class="w-5 h-5"></i>
                 </div>
-                <p class="text-3xl font-black text-slate-900"><?php echo $total_completed; ?></p>
-                <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1">Leçons validées</p>
+                <p class="text-2xl md:text-3xl font-black text-slate-900"><?php echo $total_completed; ?></p>
+                <p class="text-slate-400 text-[8px] md:text-[9px] font-bold uppercase tracking-widest mt-1">Leçons validées</p>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <div class="bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 shadow-sm active:scale-95 transition-transform">
                 <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4">
                     <i data-lucide="trello" class="w-5 h-5"></i>
                 </div>
-                <p class="text-3xl font-black text-slate-900"><?php echo ($total_completed > 0) ? 1 : 0; ?></p>
-                <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1">Cours en cours</p>
+                <p class="text-2xl md:text-3xl font-black text-slate-900"><?php echo ($total_completed > 0) ? 1 : 0; ?></p>
+                <p class="text-slate-400 text-[8px] md:text-[9px] font-bold uppercase tracking-widest mt-1">Cours en cours</p>
             </div>
         </div>
 

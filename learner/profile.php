@@ -39,22 +39,10 @@ $stats = [
     ['val' => $total_lessons, 'label' => 'Quizzes', 'icon' => 'zap', 'bg' => 'bg-amber-50', 'color' => 'text-amber-600'],
     ['val' => 0, 'label' => 'Certifs', 'icon' => 'award', 'bg' => 'bg-purple-50', 'color' => 'text-purple-600'],
 ];
+
+$page_title = "Mon Profil";
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - CODE ASIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Script Lucide pour des icônes professionnelles -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
-        .bg-asika-dark { background-color: #0F172A; }
-    </style>
-</head>
 <body class="pb-32">
 
     <!-- Header / Profile Top (Design Mature) -->
@@ -101,15 +89,14 @@ $stats = [
     </div>
 
     <div class="px-6 -mt-8 relative z-20">
-        <!-- Stats Grid Professionnelle -->
-        <div class="grid grid-cols-4 gap-3 mb-8">
+        <div class="grid grid-cols-4 gap-2 md:gap-3 mb-8">
             <?php foreach($stats as $s): ?>
-            <div class="bg-white p-4 rounded-[1.8rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center">
-                <div class="w-10 h-10 <?php echo $s['bg']; ?> <?php echo $s['color']; ?> rounded-2xl flex items-center justify-center mb-3">
-                    <i data-lucide="<?php echo $s['icon']; ?>" class="w-5 h-5"></i>
+            <div class="bg-white p-3 md:p-4 rounded-[1.8rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center active:scale-95 transition-transform">
+                <div class="w-8 h-8 md:w-10 md:h-10 <?php echo $s['bg']; ?> <?php echo $s['color']; ?> rounded-xl flex items-center justify-center mb-2 md:mb-3">
+                    <i data-lucide="<?php echo $s['icon']; ?>" class="w-4 h-4 md:w-5 md:h-5"></i>
                 </div>
-                <p class="text-lg font-black text-slate-900"><?php echo $s['val']; ?></p>
-                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><?php echo $s['label']; ?></p>
+                <p class="text-base md:text-lg font-black text-slate-900"><?php echo $s['val']; ?></p>
+                <p class="text-[7px] md:text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><?php echo $s['label']; ?></p>
             </div>
             <?php endforeach; ?>
         </div>
@@ -180,7 +167,5 @@ $stats = [
     <?php include '../includes/bottom_nav.php'; ?>
 
     <script>lucide.createIcons();</script>
-</body>
-</html>
 </body>
 </html>

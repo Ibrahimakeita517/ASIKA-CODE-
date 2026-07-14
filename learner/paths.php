@@ -127,20 +127,6 @@ include '../includes/header.php';
             <?php endforeach; ?>
         <?php endif; ?>
 
-        <!-- Language Selector Mature -->
-        <div class="bg-slate-900 rounded-[2.5rem] p-8 shadow-xl shadow-slate-900/10">
-            <h3 class="text-xs font-black text-slate-500 mb-6 text-center uppercase tracking-[0.2em]">Langue d'apprentissage</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <button class="flex flex-col items-center gap-2 py-5 rounded-[2rem] border-2 border-orange-500 bg-orange-500/10 text-white font-bold transition-all">
-                    <span class="text-[10px] text-orange-400 font-black tracking-widest uppercase">FR</span>
-                    Français
-                </button>
-                <button class="flex flex-col items-center gap-2 py-5 rounded-[2rem] border-2 border-transparent bg-white/5 text-slate-400 font-bold hover:bg-white/10 transition-all">
-                    <span class="text-[10px] text-slate-600 font-black tracking-widest uppercase">ML</span>
-                    Bambara
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Bottom Navigation -->

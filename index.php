@@ -24,8 +24,8 @@
             CODE <span class="text-asika-orange">ASIKA</span>
         </h1>
 
-        <p class="text-lg md:text-xl text-gray-400 font-light leading-relaxed mb-12 max-w-md mx-auto">
-            Maîtrisez le développement web et les bases de données en <span class="text-white font-medium">Français</span> et <span class="text-white font-medium">Bambara</span>.
+        <p class="text-sm md:text-xl text-gray-400 font-light leading-relaxed mb-10 max-w-lg mx-auto px-4">
+            Maîtrisez le <span class="text-white font-medium">Web</span>, le <span class="text-white font-medium">SQL</span>, les <span class="text-white font-medium">Réseaux</span> et l'<span class="text-white font-medium">IA</span>.
         </p>
 
         <!-- Action Area -->
@@ -38,8 +38,8 @@
                 </div>
             </a>
 
-            <p class="text-xs text-gray-500 font-medium uppercase tracking-[0.2em]">
-                Premium E-Learning Platform
+            <p class="text-[13px] md:text-sm text-orange-500 font-black uppercase tracking-normal md:tracking-[0.3em] px-2">
+                Sois la fierté des tiens
             </p>
         </div>
     </div>
@@ -48,7 +48,9 @@
     <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
         <div class="flex items-center gap-3 text-gray-500 text-sm">
             <span class="w-8 h-[1px] bg-gray-800"></span>
-            <span class="opacity-50 font-light">Simplifier l'apprentissage</span>
+            <span class="opacity-50 font-bold uppercase tracking-normal md:tracking-widest text-[10px] md:text-xs text-white">
+                Ton avenir n'a plus de limites
+            </span>
             <span class="w-8 h-[1px] bg-gray-800"></span>
         </div>
     </div>

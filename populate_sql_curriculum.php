@@ -367,7 +367,7 @@ SELECT * FROM utilisateurs WHERE actif = 1;</div>",
 
         foreach ($item['lessons'] as $index => $lesson) {
             $stmt = $pdo->prepare("INSERT INTO lessons (module_id, title, content, xp_reward, duration_min, order_index) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 25, 12, $index + 1]);
+            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 45, 12, $index + 1]);
             $lessonId = $pdo->lastInsertId();
 
             if (isset($lesson['quizzes'])) {

@@ -19,6 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role'] = $user['role'];
             $_SESSION['full_name'] = $user['full_name'];
 
+            // Mise à jour de la série de jours (streak)
+            $today = date('Y-m-d');
+            $last_login = $user['last_login_date'] ? date('Y-m-d', strtotime($user['last_login_date'])) : null;
+            $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+            if ($last_login !== $today) { // Pour ne pas incrémenter plusieurs fois le même jour
+                $new_streak = ($last_login === $yesterday) ? $user['streak'] + 1 : 1;
+                $pdo->prepare("UPDATE users SET streak = ?, last_login_date = NOW() WHERE id = ?")->execute([$new_streak, $user['id']]);
+            }
+
             // Journal d'activité
             log_activity($pdo, $user['id'], 'CONNEXION', 'Utilisateur connecté avec succès');
 

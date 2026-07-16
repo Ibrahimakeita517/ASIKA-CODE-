@@ -31,6 +31,20 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $current_lesson = $stmt->fetch();
 
+// Logique pour la série hebdomadaire
+// 1. Obtenir les jours de la semaine où une leçon a été complétée
+$today_dt = new DateTime();
+$day_of_week_num = (int)$today_dt->format('N'); // 1 pour Lundi, 7 pour Dimanche
+$start_of_week = (clone $today_dt)->modify('-' . ($day_of_week_num - 1) . ' days')->format('Y-m-d 00:00:00');
+$end_of_week = (clone $today_dt)->modify('+' . (7 - $day_of_week_num) . ' days')->format('Y-m-d 23:59:59');
+
+$stmt_streak = $pdo->prepare(
+    "SELECT DISTINCT DAYOFWEEK(completed_at) as day_num FROM user_progress WHERE user_id = ? AND completed_at BETWEEN ? AND ?"
+);
+$stmt_streak->execute([$user_id, $start_of_week, $end_of_week]);
+$completed_days_rows = $stmt_streak->fetchAll(PDO::FETCH_COLUMN);
+$completed_days = array_map(fn($d) => ($d == 1) ? 7 : $d - 1, $completed_days_rows); // Convertir Dimanche=1 -> 7, et Lundi=2 -> 1 etc.
+
 $page_title = "Tableau de bord";
 include '../includes/header.php';
 ?>
@@ -74,11 +88,11 @@ include '../includes/header.php';
             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">SÉRIE HEBDOMADAIRE</p>
             <div class="flex justify-between gap-2">
                 <?php
-                $days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-                $current_day_idx = date('N') - 1; // 0 for Monday, 6 for Sunday
+                $days = ['L', 'M', 'M', 'J', 'V', 'S', 'D']; // Lundi = 0, Dimanche = 6
+                $current_day_idx = date('N') - 1;
                 foreach($days as $index => $day):
                     $is_today = ($index == $current_day_idx);
-                    $active = ($index < $current_day_idx && $user['streak'] > 0);
+                    $active = in_array($index + 1, $completed_days); // Lundi=1, Mardi=2...
                 ?>
                 <div class="flex-1 flex flex-col items-center gap-2">
                     <div class="w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold transition-all

@@ -6,9 +6,11 @@ if (!isset($_SESSION['user_id'])) { redirect('../login.php'); }
 
 $user_id = $_SESSION['user_id'];
 
-// Récupérer les informations et stats en UNE SEULE requête (Optimisation 0 seconde)
+// 1. Récupérer les informations et stats de l'utilisateur
 $stmt = $pdo->prepare("
-    SELECT u.*, COUNT(up.id) as total_completed
+    SELECT u.*,
+           COUNT(DISTINCT up.id) as total_completed,
+           (SELECT COUNT(DISTINCT q.id) FROM quizzes q JOIN user_progress up ON q.lesson_id = up.lesson_id WHERE up.user_id = u.id) as quizzes_completed
     FROM users u
     LEFT JOIN user_progress up ON u.id = up.user_id
     WHERE u.id = ?
@@ -30,13 +32,30 @@ elseif ($user_db['level'] > 10) $rank = 'Développeur';
 elseif ($user_db['level'] > 5) $rank = 'Apprenti';
 
 // 3. XP pour le niveau suivant (Exemple : chaque niveau demande 1000 XP de plus)
+$current_level_base_xp = ($user_db['level'] - 1) * 1000;
 $next_level_xp = $user_db['level'] * 1000;
-$progress_percent = ($user_db['xp'] % 1000) / 10; // Simplifié pour l'affichage
+$xp_in_current_level = $user_db['xp'] - $current_level_base_xp;
+$progress_percent = ($xp_in_current_level / 1000) * 100;
+
+// 4. Définition des badges disponibles
+$available_badges = [
+    'assidu' => ['icon' => 'flame', 'n' => 'Assidu', 'c' => 'bg-orange-50', 'tc' => 'text-orange-500', 'desc' => 'Série de 7 jours atteinte'],
+    'rapide' => ['icon' => 'zap', 'n' => 'Apprenant Rapide', 'c' => 'bg-amber-50', 'tc' => 'text-amber-500', 'desc' => '10 leçons terminées'],
+    'parfait' => ['icon' => 'gem', 'n' => 'Collectionneur', 'c' => 'bg-blue-50', 'tc' => 'text-blue-500', 'desc' => '25 leçons terminées'],
+    'champion' => ['icon' => 'trophy', 'n' => 'Champion', 'c' => 'bg-purple-50', 'tc' => 'text-purple-500', 'desc' => 'Niveau 10 atteint'],
+];
+$total_available_badges = count($available_badges);
+
+// 5. Récupérer les badges gagnés par l'utilisateur
+$stmt_badges = $pdo->prepare("SELECT badge_id FROM user_badges WHERE user_id = ?");
+$stmt_badges->execute([$user_id]);
+$earned_badges_rows = $stmt_badges->fetchAll(PDO::FETCH_COLUMN);
+$earned_badges_count = count($earned_badges_rows);
 
 $stats = [
     ['val' => $total_lessons, 'label' => 'Leçons', 'icon' => 'book-open', 'bg' => 'bg-blue-50', 'color' => 'text-blue-600'],
     ['val' => $user_db['streak'], 'label' => 'Jours', 'icon' => 'flame', 'bg' => 'bg-orange-50', 'color' => 'text-orange-600'],
-    ['val' => $total_lessons, 'label' => 'Quizzes', 'icon' => 'zap', 'bg' => 'bg-amber-50', 'color' => 'text-amber-600'],
+    ['val' => $user_db['quizzes_completed'], 'label' => 'Quizzes', 'icon' => 'zap', 'bg' => 'bg-amber-50', 'color' => 'text-amber-600'],
     ['val' => 0, 'label' => 'Certifs', 'icon' => 'award', 'bg' => 'bg-purple-50', 'color' => 'text-purple-600'],
 ];
 
@@ -108,20 +127,14 @@ include '../includes/header.php';
                     <h3 class="font-bold text-slate-900 text-lg">Succès & Badges</h3>
                     <p class="text-slate-400 text-[10px] font-medium">Débloque des badges en apprenant</p>
                 </div>
-                <span class="text-[10px] font-black text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">0 / 24</span>
+                <span class="text-[10px] font-black text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100"><?php echo $earned_badges_count; ?> / <?php echo $total_available_badges; ?></span>
             </div>
 
             <div class="grid grid-cols-4 gap-6">
-                <?php
-                $badges = [
-                    ['icon' => 'flame', 'n' => 'Assidu', 'c' => 'bg-orange-50', 'tc' => 'text-orange-500'],
-                    ['icon' => 'zap', 'n' => 'Rapide', 'c' => 'bg-amber-50', 'tc' => 'text-amber-500'],
-                    ['icon' => 'gem', 'n' => 'Parfait', 'c' => 'bg-blue-50', 'tc' => 'text-blue-500'],
-                    ['icon' => 'trophy', 'n' => 'Champion', 'c' => 'bg-purple-50', 'tc' => 'text-purple-500'],
-                ];
-                foreach($badges as $b):
+                <?php foreach($available_badges as $badge_id => $b):
+                    $is_earned = in_array($badge_id, $earned_badges_rows);
                 ?>
-                <div class="flex flex-col items-center gap-3 opacity-20 grayscale">
+                <div class="flex flex-col items-center gap-3 <?php echo $is_earned ? '' : 'opacity-30 grayscale'; ?>" title="<?php echo $is_earned ? 'Gagné !' : $b['desc']; ?>">
                     <div class="w-14 h-14 <?php echo $b['c']; ?> <?php echo $b['tc']; ?> rounded-[1.5rem] flex items-center justify-center border border-transparent shadow-sm">
                         <i data-lucide="<?php echo $b['icon']; ?>" class="w-6 h-6"></i>
                     </div>
@@ -129,10 +142,11 @@ include '../includes/header.php';
                 </div>
                 <?php endforeach; ?>
             </div>
-
+            <?php if ($earned_badges_count === 0): ?>
             <div class="mt-8 pt-8 border-t border-slate-50 text-center">
                 <p class="text-[10px] font-bold text-slate-400 italic">Termine ta première leçon pour débloquer ton premier badge !</p>
             </div>
+            <?php endif; ?>
         </div>
 
         <!-- Quick Settings & Account -->

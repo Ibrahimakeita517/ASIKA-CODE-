@@ -59,15 +59,16 @@ $stmt = $pdo->prepare("
 $stmt->execute([$lesson['path_id']]);
 $total_lessons = $stmt->fetchColumn();
 
-// Calcul de la position actuelle (approximatif pour la démo)
+// Calcul de la progression réelle de l'utilisateur dans le parcours
 $stmt = $pdo->prepare("
-    SELECT COUNT(*) + 1
-    FROM lessons l
+    SELECT COUNT(up.id)
+    FROM user_progress up
+    JOIN lessons l ON up.lesson_id = l.id
     JOIN modules m ON l.module_id = m.id
-    WHERE m.path_id = ? AND l.order_index < ?
+    WHERE up.user_id = ? AND m.path_id = ?
 ");
-$stmt->execute([$lesson['path_id'], $lesson['order_index']]);
-$current_pos = $stmt->fetchColumn();
+$stmt->execute([$user_id, $lesson['path_id']]);
+$completed_lessons = $stmt->fetchColumn();
 
 $page_title = $lesson['title'];
 include '../includes/header.php';
@@ -80,10 +81,10 @@ include '../includes/header.php';
             <i data-lucide="chevron-left" class="w-6 h-6"></i>
         </a>
         <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div class="bg-orange-500 h-full transition-all duration-700 shadow-[0_0_10px_rgba(249,115,22,0.3)]" style="width: <?php echo ($current_pos/$total_lessons)*100; ?>%"></div>
+            <div class="bg-orange-500 h-full transition-all duration-700 shadow-[0_0_10px_rgba(249,115,22,0.3)]" style="width: <?php echo $total_lessons > 0 ? ($completed_lessons / $total_lessons) * 100 : 0; ?>%"></div>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-[10px] font-black text-slate-900 bg-slate-100 px-2 py-1 rounded-lg"><?php echo $current_pos; ?>/<?php echo $total_lessons; ?></span>
+            <span class="text-[10px] font-black text-slate-900 bg-slate-100 px-2 py-1 rounded-lg"><?php echo $completed_lessons; ?>/<?php echo $total_lessons; ?></span>
             <a href="course_details.php?id=<?php echo $lesson['path_id']; ?>" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </a>

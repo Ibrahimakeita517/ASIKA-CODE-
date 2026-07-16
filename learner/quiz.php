@@ -218,6 +218,12 @@ include '../includes/header.php';
                             feedbackIconContainer.className = "w-16 h-16 bg-yellow-500 text-white rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-yellow-500/30";
                             feedbackIcon.setAttribute('data-lucide', 'trending-up');
                         } else {
+                            if (data.new_badge_unlocked) {
+                                feedbackTitle.innerText = "Nouveau Badge !";
+                                xpText.innerText = `Tu as débloqué un nouveau succès !`;
+                                feedbackIconContainer.className = "w-16 h-16 bg-purple-500 text-white rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-purple-500/30";
+                                feedbackIcon.setAttribute('data-lucide', 'award');
+                            }
                             xpText.innerText = `+${data.xp_reward || <?php echo $lesson['xp_reward']; ?>} XP récoltés`;
                             feedbackIconContainer.className = "w-16 h-16 bg-emerald-500 text-white rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-emerald-500/30";
                             feedbackIcon.setAttribute('data-lucide', 'check');
@@ -266,12 +272,18 @@ include '../includes/header.php';
                 feedback.classList.add('translate-y-full');
                 isAnswered = false;
                 // On enlève la classe 'wrong' du bouton cliqué précédemment
+                // On réinitialise aussi les styles pour que l'utilisateur puisse réessayer
                 document.querySelectorAll('.option-btn.wrong').forEach(el => el.classList.remove('wrong'));
+                document.querySelectorAll('.option-btn.correct').forEach(el => el.classList.remove('correct'));
                 document.querySelectorAll('.letter-box.bg-red-500').forEach(el => {
                     el.classList.replace('bg-red-500', 'bg-slate-50');
                     el.classList.replace('text-white', 'text-slate-400');
                 });
             } else if (currentQuestionIndex < questions.length - 1) {
+                // Mise à jour de la barre de progression avant de passer à la question suivante
+                const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+                document.getElementById('main-progress').style.width = progress + '%';
+
                 // Si c'était juste et qu'il y a d'autres questions
                 currentQuestionIndex++;
                 feedback.classList.add('translate-y-full');

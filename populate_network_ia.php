@@ -90,7 +90,7 @@ try {
         $moduleId = $pdo->lastInsertId();
         foreach ($item['lessons'] as $idx => $lesson) {
             $stmt = $pdo->prepare("INSERT INTO lessons (module_id, title, content, xp_reward, duration_min, order_index) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 30, 15, $idx + 1]);
+            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 50, 15, $idx + 1]);
             $lessonId = $pdo->lastInsertId();
             if (isset($lesson['quizzes'])) {
                 foreach ($lesson['quizzes'] as $qData) {
@@ -112,7 +112,7 @@ try {
         $moduleId = $pdo->lastInsertId();
         foreach ($item['lessons'] as $idx => $lesson) {
             $stmt = $pdo->prepare("INSERT INTO lessons (module_id, title, content, xp_reward, duration_min, order_index) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 35, 12, $idx + 1]);
+            $stmt->execute([$moduleId, $lesson['title'], $lesson['content'], 60, 12, $idx + 1]);
             $lessonId = $pdo->lastInsertId();
             if (isset($lesson['quizzes'])) {
                 foreach ($lesson['quizzes'] as $qData) {
